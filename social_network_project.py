@@ -183,6 +183,7 @@ class CommunityDetection(Graph):
 
     '''end of part 5 & 6'''
 
+    ''''''
     '''code testing'''
 
 
@@ -226,4 +227,4 @@ print("Maximum number of connections:", max_connections)
 print("Detected Communities:")  # print detected communities
 CommunityDetection().formatted_clusters()
 
-        '''end of code testing'''
+'''end of code testing'''
