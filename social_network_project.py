@@ -1,10 +1,19 @@
-'''part 1, 2, & 3'''
+#social network project
 
+'''
+editors:
+parts 1 & 2 by Raghad
+part 3 by Leen & Raghad
+part 4 by Hasan
+parts 5 & 6 by Jiaxi
+part 7 by Jiaxi & Hasan
+'''
+
+'''part 1, 2, & 3'''
 
 class Graph:
     # dictionary
     dic = {}
-
 
 # child class of graph
 class member(Graph):
@@ -44,9 +53,9 @@ class member(Graph):
             for j in Graph.dic[i].keys():
                 print("the value is ", j)
 
-    '''end of part 1, 2, & 3'''
+'''end of part 1, 2, & 3'''
 
-    '''part 4'''
+'''part 4'''
 
     def direct_friends(self):  # returns list of all friends
         list = []
@@ -75,9 +84,9 @@ class member(Graph):
     def print_graph(self):  # directly print the dictionary
         return Graph.dic
 
-    '''end of part 4'''
+'''end of part 4'''
 
-    '''part 5 & 6'''
+'''part 5 & 6'''
 
 
 # child class of graph
@@ -181,10 +190,13 @@ class CommunityDetection(Graph):
         for idx, cluster in enumerate(clusters, start=1):  # use enumerate to number communities
             print("", f"Community {idx}: {cluster}")
 
-    '''end of part 5 & 6'''
+'''end of part 5 & 6'''
 
-    '''code testing'''
+'''part 7'''
 
+'''end of part 7'''
+
+'''code testing'''
 
 # testing code Raghad section
 p1 = member("rara", 19, "piano")
