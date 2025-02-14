@@ -226,4 +226,4 @@ print("Maximum number of connections:", max_connections)
 print("Detected Communities:")  # print detected communities
 CommunityDetection().formatted_clusters()
 
-'''end of code testing'''
+        '''end of code testing'''
