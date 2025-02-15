@@ -53,9 +53,9 @@ class member(Graph):
             for j in Graph.dic[i].keys():
                 print("the value is ", j)
 
-'''end of part 1, 2, & 3'''
+        '''end of part 1, 2, & 3'''
 
-'''part 4'''
+        '''part 4'''
 
     def direct_friends(self):  # returns list of all friends
         list = []
@@ -194,11 +194,125 @@ class CommunityDetection(Graph):
 
 '''part 7'''
 
+class AdvancedInsights(Graph):
+    def __init__(self):
+        pass
+
+    # Jiaxi Part for calculate the average degree
+    def average_degree(self):
+        all_degree = 0
+        num_nodes = len(Graph.dic)
+        for node in Graph.dic.keys():
+            degree = len(Graph.dic[node])
+            all_degree += degree
+        if num_nodes > 0:
+            average_degree = all_degree / num_nodes
+            return average_degree
+        else:
+            return 0
+
+    # Hasan Part
+    def network_density(self):
+        n = len(Graph.dic) #number of nodes
+        total_possible_edges = (n * (n - 1)) #total edges formula
+        total_edges = 0
+        for relations in Graph.dic.keys(): #loop to get total edges
+            edges = len(Graph.dic[relations])
+            total_edges += edges
+        network_density = total_edges / total_possible_edges #network density formula
+        return network_density
+
+    # Jiaxi Part
+    def clustering_coefficient(self):
+        clustering_coefficients = {}  # dic for coefficients
+
+        for node in Graph.dic.keys():
+            neighbors = list(Graph.dic[node].keys())  # get the list of friends
+            num_neighbors = len(neighbors)  # get the amount of friends
+
+            if num_neighbors < 2:  # according to the function
+                clustering_coefficients[node] = 0  # if k=0 or k=1 coefficient will be meaningless
+                continue
+
+            edge_existed = 0  # create a value to show the edges existed
+
+            # check the edges between neighbors
+            for i in range(num_neighbors):  # friends loop
+                for neighbor_index in range(i + 1,
+                                            num_neighbors):  # friends' friends loop # just need to check the relationship between each pair of neighbors once both positive and negative are the same
+                    neighbor1 = neighbors[i]  # friends
+                    neighbor2 = neighbors[neighbor_index]  # friends' friends
+                    if neighbor2 in Graph.dic[
+                        neighbor1]:  # if neighbor2 is a neighbor of neighbor1 it means there is an edge between neighbor1 and neighbor2 so the edges need be added 1
+                        edge_existed += 1
+
+            if num_neighbors >= 2:
+                current_coefficient = (edge_existed) / (num_neighbors * (num_neighbors - 1))  # function
+                clustering_coefficients[node] = current_coefficient  # store every nodes' clustering_coefficients
+
+        return clustering_coefficients
+
+    def centrality_analysis(self):
+        pass
+
+    def degree_centrality(self, membername): #counts how many friends a member has
+        degree_centrality = len(Graph.dic[membername])
+        return degree_centrality
+
+    def betweenness_centrality(self, membername):
+        total_betweenness_centrality = 0
+        for member1 in Graph.dic:
+            for member2 in Graph.dic:
+                if member1 != member2 and member1 not in Graph.dic[member2]:
+                    if self.all_shortest_paths(member1, member2):
+                        paths = self.all_shortest_paths(member1, member2)
+                        print(paths)
+                        betweenness_centrality = 0
+                        for path in paths:
+                            path.pop(0)
+                            path.pop()
+                            for name in path:
+                                if name == membername:
+                                    betweenness_centrality += 1
+                        betweenness_centrality /= len(self.all_shortest_paths(member1, member2))
+                        total_betweenness_centrality += betweenness_centrality
+        return total_betweenness_centrality
+
+    def all_shortest_paths(self, start_name, end_name):
+        # check names
+        if start_name not in Graph.dic and end_name not in Graph.dic:
+            return "The start name and end name not found:", start_name, end_name
+
+        elif start_name not in Graph.dic:
+            return "The start name not found：", start_name
+
+        elif end_name not in Graph.dic:
+            return "The end name not found：", end_name
+
+        queue = [(start_name, [start_name])]  # queue to store the current node and path
+        shortest_paths = []  #store shortest path (or paths if there are more than one)
+        min_length = float('inf') #starts with min length as infinity
+
+        while queue:
+            (current_node, path) = queue.pop(0)  # pop the top element
+            if current_node == end_name:
+                if len(path) < min_length:
+                    min_length = len(path) #updates the min path lenght
+                    shortest_paths = [path]
+                elif len(path) == min_length:
+                    shortest_paths += [path] #adds another equally long path
+
+            for friend in Graph.dic.get(current_node, {}):  # update through the current node's neighbors
+                if friend not in path: #prevents going back
+                    queue.append((friend, path + [friend]))  # add the neighbor and path to the queue
+
+        return shortest_paths if shortest_paths else None
+
 '''end of part 7'''
 
 '''code testing'''
 
-# testing code Raghad section
+# testing code Raghad and Leen section
 p1 = member("rara", 19, "piano")
 p2 = member("Lolo", 18, "reading")
 p3 = member("meme", 17, "drawing")
@@ -209,6 +323,12 @@ p1.addrelationship(p3, 2)
 p2.addrelationship(p1, 4)
 p2.addrelationship(p3, 3)
 p3.addrelationship(p1, 2)
+
+#adding p4 relations
+p2.addrelationship(p4, 1)
+p4.addrelationship(p2, 3)
+p3.addrelationship(p4, 5)
+p4.addrelationship(p3, 2)
 
 # testing Hasan section
 print("Original graph:", p1.print_graph())
@@ -238,4 +358,23 @@ print("Maximum number of connections:", max_connections)
 print("Detected Communities:")  # print detected communities
 CommunityDetection().formatted_clusters()
 
+# testing P7-1 code
+average_degree = AdvancedInsights().average_degree()
+print("Average degree:", average_degree)
+
+# testing P7-2 code
+analysis = AdvancedInsights()
+density = analysis.network_density()
+print("Network Density:", density)
+
+# testing P7-3 code
+clustering_coefficients = AdvancedInsights().clustering_coefficient()
+print("Clustering Coefficients:", clustering_coefficients)
+
+#testing P7-4 code
+
+#print("GOT EQUAL PATH", path, "Shortest Paths", shortest_paths)
+
+print(f"Degree centrality of {p1.name}:", AdvancedInsights().degree_centrality(p1.name))
+print(f"Betweenness centrality of {p3.name}", AdvancedInsights().betweenness_centrality(p3.name))
 '''end of code testing'''
