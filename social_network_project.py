@@ -252,33 +252,12 @@ class AdvancedInsights(Graph):
 
         return clustering_coefficients
 
-    def centrality_analysis(self):
-        pass
-
+    # Hasan Part
     def degree_centrality(self, membername): #counts how many friends a member has
         degree_centrality = len(Graph.dic[membername])
         return degree_centrality
 
-    def betweenness_centrality(self, membername):
-        total_betweenness_centrality = 0
-        for member1 in Graph.dic:
-            for member2 in Graph.dic:
-                if member1 != member2 and member1 not in Graph.dic[member2]:
-                    if self.all_shortest_paths(member1, member2):
-                        paths = self.all_shortest_paths(member1, member2)
-                        print(paths)
-                        betweenness_centrality = 0
-                        for path in paths:
-                            path.pop(0)
-                            path.pop()
-                            for name in path:
-                                if name == membername:
-                                    betweenness_centrality += 1
-                        betweenness_centrality /= len(self.all_shortest_paths(member1, member2))
-                        total_betweenness_centrality += betweenness_centrality
-        return total_betweenness_centrality
-
-    def all_shortest_paths(self, start_name, end_name):
+    def all_shortest_paths(self, start_name, end_name): #gets all shortest paths (because there might be more than one way)
         # check names
         if start_name not in Graph.dic and end_name not in Graph.dic:
             return "The start name and end name not found:", start_name, end_name
@@ -308,42 +287,93 @@ class AdvancedInsights(Graph):
 
         return shortest_paths if shortest_paths else None
 
+    def betweenness_centrality(self, membername): #checks how much a member connects other members (bridge)
+        total_betweenness_centrality = 0
+        for member1 in Graph.dic: #goes through all members
+            for member2 in Graph.dic: #compares all members with all members
+                if member1 != member2 and member1 not in Graph.dic[member2]: #avoid member1 being member2 and avoid member1 being friends with member 2 (because there will be nobody inbetween)
+                    if self.all_shortest_paths(member1, member2): #checks if path exists
+                        paths = self.all_shortest_paths(member1, member2)
+                        betweenness_centrality = 0
+                        for path in paths:
+                            path.pop(0) #remove member1 from the path
+                            path.pop() #remove member2 from the path (we want people inbetween)
+                            for name in path:
+                                if name == membername: #check to find if our input(membername) is in this path (is a bridge)
+                                    betweenness_centrality += 1
+                        betweenness_centrality /= len(self.all_shortest_paths(member1, member2)) #if there are mutiple shortest paths we divide the centrality (the connection is not as important)
+                        total_betweenness_centrality += betweenness_centrality
+        return total_betweenness_centrality
+
+    def centrality_analysis(self): #get most popular members using previous functions
+        #initialise variables
+        degree_centrality_scores = {}
+        betwenness_centrality_scores = {}
+        max_degree_centrality_score = 0
+        max_betweenness_centrality_score = 0
+        best_degree_centrality = []
+        best_betwenness_centrality = []
+
+        for membername in Graph.dic: #getting all scores
+            degree_centrality_scores[membername] = self.degree_centrality(membername)
+            betwenness_centrality_scores[membername] = self.betweenness_centrality(membername)
+
+        for membername in degree_centrality_scores: #finding the max scores
+            if degree_centrality_scores[membername] > max(degree_centrality_scores.values()):
+                best_degree_centrality = [membername]
+            elif degree_centrality_scores[membername] == max(degree_centrality_scores.values()):
+                best_degree_centrality.append(membername)
+
+        for membername in betwenness_centrality_scores: #finding the max scores
+            if betwenness_centrality_scores[membername] > max(betwenness_centrality_scores.values()):
+                best_betwenness_centrality = [membername]
+            elif betwenness_centrality_scores[membername] == max(betwenness_centrality_scores.values()):
+                best_betwenness_centrality.append(membername)
+
+        max_degree_centrality_score = max(degree_centrality_scores.values())
+        max_betweenness_centrality_score = max(betwenness_centrality_scores.values())
+
+        if best_degree_centrality and best_betwenness_centrality:
+            return best_degree_centrality, max_degree_centrality_score, best_betwenness_centrality, max_betweenness_centrality_score
+        else:
+            raise "Error: best_degree_centrality or best_betwenness_centrality does not exist"
+
 '''end of part 7'''
 
 '''code testing'''
 
+print("Parts 1-4:")
 # testing code Raghad and Leen section
-p1 = member("rara", 19, "piano")
-p2 = member("Lolo", 18, "reading")
-p3 = member("meme", 17, "drawing")
-p4 = member("shosho", 20, "piano")
-p5 = member("fofo", 16, "reading")
-p1.addrelationship(p2, 4)
-p1.addrelationship(p3, 2)
-p2.addrelationship(p1, 4)
-p2.addrelationship(p3, 3)
-p3.addrelationship(p1, 2)
-
-#adding p4 relations
-p2.addrelationship(p4, 1)
-p4.addrelationship(p2, 3)
-p3.addrelationship(p4, 5)
+p1 = member("Mariam", 19, "piano")
+p2 = member("Amina", 18, "reading")
+p3 = member("Fatma", 17, "drawing")
+p4 = member("Laila", 20, "piano")
+p5 = member("Sarah", 16, "reading")
+p6 = member("Mohammed", 18, "football")
+p7 = member("Yiheng", 16, "tennis")
+p1.addrelationship(p2, 1)
+p1.addrelationship(p4, 3)
+p1.addrelationship(p5, 4)
+p2.addrelationship(p1, 2)
+p2.addrelationship(p3, 5)
+p3.addrelationship(p2, 6)
+p3.addrelationship(p4, 6)
+p4.addrelationship(p1, 7)
 p4.addrelationship(p3, 2)
+p4.addrelationship(p5, 7)
+p5.addrelationship(p1, 8)
+p5.addrelationship(p4, 1)
+p6.addrelationship(p7, 8)
+p7.addrelationship(p6, 2)
 
 # testing Hasan section
-print("Original graph:", p1.print_graph())
+print("Graph:", p1.print_graph())
 print(f"Direct friends of {p1.name}:", p1.direct_friends())
-print(f"Mutual friends of {p1.name} and {p2.name}:", p1.mutual_friends(p2))
+print(f"Mutual friends of {p5.name} and {p2.name}:", p5.mutual_friends(p2))
 print(f"Friend suggestions for {p3.name}:", p3.suggest_friends())
-p1.removemeber()
-print(f"Graph after removing {p1.name}:", p1.print_graph())
 print()
-p1 = member("rara", 19, "piano")
-p1.addrelationship(p2, 4)
-p1.addrelationship(p3, 2)
-p2.addrelationship(p1, 4)
-p3.addrelationship(p1, 2)
 
+print("Part 5-6:")
 # testing Jiaxi section
 # find shortest path
 path, length = NetworkAnalysis().shortest_path(p3.name, p1.name)
@@ -357,7 +387,9 @@ print("Maximum number of connections:", max_connections)
 
 print("Detected Communities:")  # print detected communities
 CommunityDetection().formatted_clusters()
+print()
 
+print("Part 7:")
 # testing P7-1 code
 average_degree = AdvancedInsights().average_degree()
 print("Average degree:", average_degree)
@@ -377,4 +409,7 @@ print("Clustering Coefficients:", clustering_coefficients)
 
 print(f"Degree centrality of {p1.name}:", AdvancedInsights().degree_centrality(p1.name))
 print(f"Betweenness centrality of {p3.name}", AdvancedInsights().betweenness_centrality(p3.name))
+dc, mdc, bc, mbc = AdvancedInsights().centrality_analysis()
+print(f"Centrality analysis:\n Most popular in Degree Centrality: {dc} (Score: {mdc})\n Most popular in Betweennes centrality: {bc} (Score: {mbc})")
+
 '''end of code testing'''
